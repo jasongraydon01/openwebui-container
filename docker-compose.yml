@@ -6,14 +6,13 @@ services:
       - "3000:8080"
     environment:
       - WEBUI_ENV=production
+      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
     volumes:
       - openwebui_data:/app/backend/data  # Volume for OpenWebUI data (SQLite database and logs)
     depends_on:
       - backend
     restart: unless-stopped
     runtime: nvidia  # Ensure GPU access (if needed for specific containers)
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
 
   backend:
     build:
@@ -29,14 +28,13 @@ services:
       - ollama_data:/root/.ollama  # Mount volume for Ollama models
     environment:
       - OLLAMA_HOST=http://ollama:11434
+      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
     env_file:
       - ./backend/.env
     depends_on:
       - ollama
     restart: unless-stopped
     runtime: nvidia  # Enable GPU access for backend (if required)
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
 
   ollama:
     image: ollama/ollama:latest
