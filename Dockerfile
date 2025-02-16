@@ -1,11 +1,17 @@
 # Use a slim Python base image
 FROM python:3.10-slim
 
-# Install cron (if not already installed)
+# Install cron and curl (if not already installed)
 RUN apt-get update && apt-get install -y cron curl
 
 # Set working directory inside the container
 WORKDIR /app
+
+# Copy the requirements.txt to the container
+COPY ./backend/requirements.txt /app/requirements.txt
+
+# Install Python dependencies from the requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Install Ollama if not already installed
 RUN if ! command -v ollama &>/dev/null; then \
