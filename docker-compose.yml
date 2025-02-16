@@ -23,7 +23,7 @@ services:
       - "5001:5001"
     volumes:
       - ./backend:/app/backend  # Mount local backend code
-      - pptx_files:/app/pptx_files  # Mount volume for PowerPoint files
+      - /home/ubuntu/openwebui-container/pptx_files:/app/pptx_files  # Mount volume for PowerPoint files
       - openwebui_data:/app/backend/data  # Mount volume for SQLite database and logs
       - ollama_data:/root/.ollama  # Mount volume for Ollama models
     environment:

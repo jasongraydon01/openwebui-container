@@ -17,35 +17,27 @@ else
     echo "Ollama is already installed."
 fi
 
-# Check for model directory in .root (or adjust the path as needed)
+# Ensure the model directory exists
 MODEL_DIR="/root/.ollama/models"  # Adjust path to where the models are stored in the root directory
+if [ ! -d "$MODEL_DIR" ]; then
+    echo "Model directory not found, creating $MODEL_DIR..."
+    mkdir -p "$MODEL_DIR"
+fi
 
 # Ensure models are downloaded (before processing PowerPoint files)
 echo "Checking for required Ollama models..."
 
-# Check for model mistral:7b
-if [ ! -d "$MODEL_DIR/mistral:7b" ]; then
-    echo "Model mistral:7b not found. Downloading..."
-    ollama pull mistral:7b
-else
-    echo "Model mistral:7b already downloaded."
-fi
+# List of models to check/download
+models=("mistral:7b" "nomic-embed-text" "deepseek-r1:7b")
 
-# Check for model nomic-embed-text
-if [ ! -d "$MODEL_DIR/nomic-embed-text" ]; then
-    echo "Model nomic-embed-text not found. Downloading..."
-    ollama pull nomic-embed-text
-else
-    echo "Model nomic-embed-text already downloaded."
-fi
-
-# Check for model deepseek-r1:7b
-if [ ! -d "$MODEL_DIR/deepseek-r1:7b" ]; then
-    echo "Model deepseek-r1:7b not found. Downloading..."
-    ollama pull deepseek-r1:7b
-else
-    echo "Model deepseek-r1:7b already downloaded."
-fi
+for model in "${models[@]}"; do
+    if [ ! -d "$MODEL_DIR/$model" ]; then
+        echo "Model $model not found. Downloading..."
+        ollama pull "$model"
+    else
+        echo "Model $model already downloaded."
+    fi
+done
 
 # Process PowerPoint files after models are downloaded
 echo "Processing PowerPoint files..."
