@@ -7,12 +7,10 @@ RUN apt-get update && apt-get install -y cron curl
 # Set working directory inside the container
 WORKDIR /app
 
-# Install Ollama
+# Install Ollama if not already installed
 RUN if ! command -v ollama &>/dev/null; then \
     echo "Ollama not found, installing..."; \
     curl -fsSL https://ollama.com/install.sh | bash; \
-    # Move the Ollama binary to /usr/bin if not already there
-    mv /root/ollama /usr/bin/ollama; \
     fi
 
 # Set a custom location for models and ensure Ollama uses it
