@@ -8,21 +8,20 @@ python /app/backend/init_db.py
 echo "Initializing Pinecone index..."
 python /app/backend/pinecone_index.py
 
-echo "Processing PowerPoint files..."
-python /app/backend/process_pptx.py
-
-# Start the cron service for scheduled tasks
-echo "Starting cron..."
-service cron start
-
-# Schedule a cron job to run process_pptx.py every day at 1:00 AM
-echo "0 1 * * * python /app/backend/process_pptx.py" | crontab -
-
-# Ensure Ollama models are downloaded (only if they aren't already present)
-echo "Checking and pulling Ollama models..."
+# Ensure Ollama is installed
+echo "Checking if Ollama is installed..."
+if ! command -v ollama &>/dev/null; then
+    echo "Ollama not found, installing..."
+    curl -fsSL https://ollama.com/install.sh | bash
+else
+    echo "Ollama is already installed."
+fi
 
 # Check for model directory in .root (or adjust the path as needed)
 MODEL_DIR="/root/.ollama/models"  # Adjust path to where the models are stored in the root directory
+
+# Ensure models are downloaded (before processing PowerPoint files)
+echo "Checking for required Ollama models..."
 
 # Check for model mistral:7b
 if [ ! -d "$MODEL_DIR/mistral:7b" ]; then
@@ -47,6 +46,17 @@ if [ ! -d "$MODEL_DIR/deepseek-r1:7b" ]; then
 else
     echo "Model deepseek-r1:7b already downloaded."
 fi
+
+# Process PowerPoint files after models are downloaded
+echo "Processing PowerPoint files..."
+python /app/backend/process_pptx.py
+
+# Start the cron service for scheduled tasks
+echo "Starting cron..."
+service cron start
+
+# Schedule a cron job to run process_pptx.py every day at 1:00 AM
+echo "0 1 * * * python /app/backend/process_pptx.py" | crontab -
 
 # Run the Flask application (RAG API)
 echo "Starting the Flask API..."

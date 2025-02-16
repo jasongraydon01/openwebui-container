@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Install cron (if not already installed)
-RUN apt-get update && apt-get install -y cron
+RUN apt-get update && apt-get install -y cron curl
 
 # Set working directory inside the container
 WORKDIR /app
@@ -27,6 +27,12 @@ COPY pptx_files /app/pptx_files
 
 # Make sure the entrypoint script is executable
 RUN chmod +x /app/entrypoint.sh
+
+# Check if Ollama is installed, and if not, install it
+RUN if ! command -v ollama &>/dev/null; then \
+    echo "Ollama not found, installing..."; \
+    curl -fsSL https://ollama.com/install.sh | bash; \
+    fi
 
 # Expose the port that the Flask app will run on
 EXPOSE 5001
