@@ -3,6 +3,7 @@
 
 1. **Launch Amazon EC2 instance (G4dn)**:
    - Start with `2large` (due to 8-CPU limit but scale up later as needed).
+   - Adjust security to allow 3000, 5001, 11434, 8080.
 
 2. **Set up standard Ubuntu protocols**:
    - Update system packages: `sudo apt update && sudo apt upgrade`
@@ -43,6 +44,11 @@
       ```bash
       docker-compose up -d
       ```
+
+11. **Check the setup to ensure openwebui is running**:
+    - Open WebUI should be accessible at `http://<instance-ip>:3000`
+    - Ollama should be accessible at `http://<instance-ip>:11434`
+    - RAG API should be accessible at `http://<instance-ip>:5001`
 
 ### Additional Considerations:
 - **Verify Docker and Docker Compose**: After installation, verify Docker and Docker Compose are running correctly:
