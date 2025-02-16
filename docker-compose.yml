@@ -12,6 +12,10 @@ services:
       - backend
     restart: unless-stopped
     runtime: nvidia  # Ensure GPU access (if needed for specific containers)
+    deploy:
+      resources:
+        limits:
+          nvidia.com/gpu.count: 2
 
   backend:
     build:
@@ -33,6 +37,10 @@ services:
       - ollama
     restart: unless-stopped
     runtime: nvidia  # Enable GPU access for backend (if required)
+    deploy:
+      resources:
+        limits:
+          nvidia.com/gpu.count: 2
 
   ollama:
     image: ollama/ollama:latest
@@ -41,8 +49,12 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama  # Volume for Ollama models
-    restart: unless-stopped
-    runtime: nvidia  # Enable GPU access for Ollama container
+      restart: unless-stopped
+      runtime: nvidia  # Enable GPU access for Ollama container
+    deploy:
+      resources:
+        limits:
+          nvidia.com/gpu.count: 2
 
 volumes:
   openwebui_data:  # Volume for OpenWebUI data (SQLite database, logs, etc.)

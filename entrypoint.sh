@@ -1,28 +1,5 @@
 #!/bin/bash
 
-# Install NVIDIA Container Toolkit (if not already installed)
-echo "Installing NVIDIA Container Toolkit..."
-
-# Add NVIDIA container repository
-if ! dpkg -l | grep -q nvidia-container-toolkit; then
-    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
-        | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
-    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-        | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
-        | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-
-    # Update apt and install NVIDIA container toolkit
-    sudo apt-get update
-    sudo apt-get install -y nvidia-container-toolkit
-
-    # Ensure Docker is set to use GPUs
-    echo "Configuring Docker to use GPUs..."
-    sudo nvidia-ctk runtime configure --runtime=docker
-    sudo systemctl restart docker
-else
-    echo "NVIDIA Container Toolkit is already installed."
-fi
-
 # Initialize the database first (if it hasn't been initialized yet)
 echo "Initializing the database..."
 python /app/backend/init_db.py
