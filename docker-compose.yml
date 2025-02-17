@@ -8,6 +8,15 @@ services:
       - "3000:8080"
     volumes:
       - openwebui_data:/app/backend/data  # Persistent storage for OpenWebUI
+    environment:
+      - WEBUI_ENV=production  # Ensure production mode
+      - WEBUI_ENABLE_CONTROLS=true  # Enables advanced UI options
+      - WEBUI_ENABLE_MULTI_USER=true  # Allow multiple users to log in
+      - WEBUI_DEFAULT_MODELS=ollama/mistral:7b  # Set a default model
+      - WEBUI_OLLAMA_BASE_URL=http://ollama:11434  # Ensure OpenWebUI connects to your Ollama service
+      - WEBUI_ALLOW_FILE_UPLOADS=true  # Allow users to upload files for processing
+      - WEBUI_DISABLE_ANALYTICS=true  # Disable telemetry (for privacy)
+      - WEBUI_HIDE_DEFAULT_MODELS=true  # Only show your configured models (prevents clutter)
     deploy:
       resources:
         reservations:
