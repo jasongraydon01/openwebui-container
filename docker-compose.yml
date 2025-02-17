@@ -39,12 +39,6 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
     runtime: nvidia
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://ollama:11434/health"]
-      interval: 30s
-      retries: 3
-      start_period: 10s
-      timeout: 10s
 
   ollama:
     image: ollama/ollama:latest
