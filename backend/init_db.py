@@ -1,12 +1,8 @@
 import sqlite3
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Define path to the database
-DB_PATH = os.getenv("DATABASE_PATH")
+# Ensure database is stored in the correct directory
+DB_PATH = os.path.join(os.path.dirname(__file__), "file_log.db")
 
 def initialize_database():
     """Initialize the SQLite database and create necessary tables."""

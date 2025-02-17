@@ -17,6 +17,7 @@ services:
       - WEBUI_ALLOW_FILE_UPLOADS=true  # Allow users to upload files for processing
       - WEBUI_DISABLE_ANALYTICS=true  # Disable telemetry (for privacy)
       - WEBUI_HIDE_DEFAULT_MODELS=true  # Only show your configured models (prevents clutter)
+      - WEBUI_ENABLE_FILE_UPLOADS=true  # Enable file uploads
     deploy:
       resources:
         reservations:
