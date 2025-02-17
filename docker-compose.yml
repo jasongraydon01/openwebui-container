@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:cuda
@@ -9,46 +7,33 @@ services:
     volumes:
       - openwebui_data:/app/backend/data  # Persistent storage for OpenWebUI
     environment:
-      - WEBUI_ENV=production  # Ensure production mode
-      - WEBUI_ENABLE_CONTROLS=true  # Enables advanced UI options
-      - WEBUI_ENABLE_MULTI_USER=true  # Allow multiple users to log in
-      - WEBUI_DEFAULT_MODELS=ollama/mistral:7b  # Set a default model
-      - WEBUI_OLLAMA_BASE_URL=http://ollama:11434  # Ensure OpenWebUI connects to your Ollama service
-      - WEBUI_ALLOW_FILE_UPLOADS=true  # Allow users to upload files for processing
-      - WEBUI_DISABLE_ANALYTICS=true  # Disable telemetry (for privacy)
-      - WEBUI_HIDE_DEFAULT_MODELS=true  # Only show your configured models (prevents clutter)
-      - WEBUI_ENABLE_FILE_UPLOADS=true  # Enable file uploads
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - WEBUI_ENV=production
+      - WEBUI_ENABLE_CONTROLS=true
+      - WEBUI_ENABLE_MULTI_USER=true
+      - WEBUI_DEFAULT_MODELS=ollama/mistral:7b
+      - WEBUI_OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_ALLOW_FILE_UPLOADS=true
+      - WEBUI_DISABLE_ANALYTICS=true
+      - WEBUI_HIDE_DEFAULT_MODELS=true
+      - WEBUI_ENABLE_FILE_UPLOADS=true
     restart: unless-stopped
 
   backend:
     build:
-      context: .  # The context is the root of your project
-      dockerfile: Dockerfile  # Path to the Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: backend
     ports:
       - "5001:5001"
     volumes:
-      - ./backend:/app/backend  # Mount backend code (useful for development)
-      - ./file_log.db:/app/backend/file_log.db  # Bind mount for file_log.db
-      - ./pptx_files:/app/backend/pptx_files  # Bind mount for PPTX files
+      - ./backend:/app/backend:rw  # Mount backend code (useful for development)
+      - ./pptx_files:/app/pptx_files:rw  # Mount PPTX files
+    entrypoint: ["/app/entrypoint.sh"]
     depends_on:
       - ollama
     environment:
       - OLLAMA_HOST=http://ollama:11434
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - DATABASE_PATH=/app/file_log.db  # Use path inside container
     restart: unless-stopped
 
   ollama:
@@ -57,22 +42,16 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ./ollama_models:/root/.ollama/models  # Bind mount to persist models
+      - ./ollama/ollama:/root/.ollama
     entrypoint: ["/bin/sh", "-c", "
-        ollama serve &  # Start Ollama in the background
-        sleep 5;  # Give some time for Ollama to initialize
+        ollama serve & 
+        sleep 5;
         ollama pull mistral:7b &&
         ollama pull nomic-embed-text &&
         ollama pull deepseek-r1:7b &&
-        fg"]  # Bring Ollama back to the foreground
+        fg"]
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
 
 volumes:
-  openwebui_data:  # Persistent storage for OpenWebUI data
+  openwebui_data:
+  file_log_db:  # Persistent volume for file_log.db

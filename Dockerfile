@@ -27,6 +27,3 @@ RUN chmod +x /app/entrypoint.sh
 
 # Expose the port that the Flask app will run on
 EXPOSE 5001
-
-# Use the entrypoint script to initialize and start the app
-ENTRYPOINT ["/app/entrypoint.sh"]
