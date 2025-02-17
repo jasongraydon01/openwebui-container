@@ -7,7 +7,7 @@ import time
 class Pipe:
     class Valves(BaseModel):
         api_url: str = Field(
-            default="http://host.docker.internal:5001/query",
+            default="http://<instance-ip>:5001/query",
             description="RAG API endpoint URL",
         )
         emit_interval: float = Field(

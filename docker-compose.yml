@@ -1,40 +1,45 @@
+version: '3.8'
+
 services:
   openwebui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:cuda
     container_name: openwebui
     ports:
       - "3000:8080"
-    environment:
-      - WEBUI_ENV=production
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
     volumes:
-      - openwebui_data:/app/backend/data  # Volume for OpenWebUI data (SQLite database and logs)
-    depends_on:
-      - backend
+      - openwebui_data:/app/backend/data  # Persistent storage for OpenWebUI
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     restart: unless-stopped
-    runtime: nvidia  # Ensure GPU access (if needed for specific containers)
 
   backend:
     build:
       context: .  # The context is the root of your project
       dockerfile: Dockerfile  # Path to the Dockerfile
-    container_name: openwebui-rag-backend
+    container_name: backend
     ports:
       - "5001:5001"
     volumes:
-      - ./backend:/app/backend  # Mount local backend code
-      - /home/ubuntu/openwebui-container/pptx_files:/app/pptx_files  # Mount volume for PowerPoint files
-      - openwebui_data:/app/backend/data  # Mount volume for SQLite database and logs
-      - ollama_data:/root/.ollama  # Mount volume for Ollama models
-    environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
-    env_file:
-      - ./backend/.env
+      - ./backend:/app/backend  # Mount backend code (useful for development)
+      - ./file_log.db:/app/backend/file_log.db  # Bind mount for file_log.db
+      - ./pptx_files:/app/backend/pptx_files  # Bind mount for PPTX files
     depends_on:
       - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     restart: unless-stopped
-    runtime: nvidia  # Enable GPU access for backend (if required)
 
   ollama:
     image: ollama/ollama:latest
@@ -42,13 +47,22 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ollama_data:/root/.ollama  # Volume for Ollama models
+      - ./ollama_models:/root/.ollama/models  # Bind mount to persist models
+    entrypoint: ["/bin/sh", "-c", "
+        ollama serve &  # Start Ollama in the background
+        sleep 5;  # Give some time for Ollama to initialize
+        ollama pull mistral:7b &&
+        ollama pull nomic-embed-text &&
+        ollama pull deepseek-r1:7b &&
+        fg"]  # Bring Ollama back to the foreground
     restart: unless-stopped
-    runtime: nvidia  # Enable GPU access for Ollama container
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Use all available GPUs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
 volumes:
-  openwebui_data:  # Volume for OpenWebUI data (SQLite database, logs, etc.)
-  ollama_data:     # Volume for Ollama models
-  pptx_files:      # Volume for PowerPoint files
+  openwebui_data:  # Persistent storage for OpenWebUI data

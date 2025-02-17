@@ -2,7 +2,7 @@ import sqlite3
 import os
 
 # Define path to the database
-DB_PATH = "/app/backend/data/file_log.db"  # This will be mapped to persistent storage in Docker
+DB_PATH = "file_log.db"  # This will be mapped to persistent storage in Docker
 
 def initialize_database():
     """Initialize the SQLite database and create necessary tables."""
