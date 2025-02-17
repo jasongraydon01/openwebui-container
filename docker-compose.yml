@@ -16,7 +16,9 @@ services:
       - WEBUI_DISABLE_ANALYTICS=true
       - WEBUI_HIDE_DEFAULT_MODELS=true
       - WEBUI_ENABLE_FILE_UPLOADS=true
+      - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
+    runtime: nvidia
 
   backend:
     build:
@@ -30,11 +32,19 @@ services:
       - ./pptx_files:/app/pptx_files:rw  # Mount PPTX files
     entrypoint: ["/app/entrypoint.sh"]
     depends_on:
-      - ollama
+      - ollama  # This just ensures Ollama is started, but does not wait for readiness
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - DATABASE_PATH=/app/file_log.db  # Use path inside container
+      - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
+    runtime: nvidia
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://ollama:11434/health"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
 
   ollama:
     image: ollama/ollama:latest
@@ -43,14 +53,16 @@ services:
       - "11434:11434"
     volumes:
       - ./ollama/ollama:/root/.ollama
-    entrypoint: ["/bin/sh", "-c", "
-        ollama serve & 
-        sleep 5;
-        ollama pull mistral:7b &&
-        ollama pull nomic-embed-text &&
-        ollama pull deepseek-r1:7b &&
-        fg"]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
+    runtime: nvidia
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/health"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
 
 volumes:
   openwebui_data:
