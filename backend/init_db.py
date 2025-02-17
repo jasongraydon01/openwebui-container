@@ -1,8 +1,12 @@
 import sqlite3
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Define path to the database
-DB_PATH = "file_log.db"  # This will be mapped to persistent storage in Docker
+DB_PATH = os.getenv("DATABASE_PATH")
 
 def initialize_database():
     """Initialize the SQLite database and create necessary tables."""
