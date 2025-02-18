@@ -86,7 +86,9 @@ def chat_with_rag(query, retrieved_slides=None):
     if not retrieved_slides:
         return chat_normal(query), []
 
-    context = "\n".join([f"Slide {s['slide_number']}: {s['text']}" for s in retrieved_slides])
+    # Format sources with Markdown for Open WebUI
+    context = "\n".join([f"[Slide {s['slide_number']}]({s['source']}): {s['text']}" for s in retrieved_slides if s["source"] != "Unknown source"])
+
     prompt = f"Using the following context, answer the question:\n\nContext:\n{context}\n\nQuestion: {query}"
 
     response = ollama.chat(model="mistral:7b", messages=[{"role": "user", "content": prompt}])
@@ -116,11 +118,16 @@ def query_rag():
     if not query:
         return jsonify({"error": "Query cannot be empty"}), 400
 
-    response, sources = chat_auto(query)
+    response, raw_sources = chat_auto(query)
+
+    # Format sources for Open WebUI as Markdown links
+    formatted_sources = [
+        f"[Slide {s['slide_number']}]({s['source']}): {s['text']}" for s in raw_sources if s["source"] != "Unknown source"
+    ]
 
     return jsonify({
         "response": response,
-        "sources": sources
+        "sources": formatted_sources  # Send formatted sources for Open WebUI
     })
 
 # ✅ API Route: Retrieve Relevant Slides
@@ -134,7 +141,13 @@ def retrieve_slides():
         return jsonify({"error": "Query cannot be empty"}), 400
 
     slides = retrieve_relevant_slides(query)
-    return jsonify({"slides": slides})
+
+    # Format sources for Open WebUI
+    formatted_slides = [
+        f"[Slide {s['slide_number']}]({s['source']}): {s['text']}" for s in slides if s["source"] != "Unknown source"
+    ]
+
+    return jsonify({"slides": formatted_slides})
 
 # ✅ Run the Flask App (Production-Ready)
 if __name__ == "__main__":
