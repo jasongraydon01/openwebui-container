@@ -87,7 +87,7 @@ def chat_with_rag(query, retrieved_slides=None):
         return chat_normal(query), []
 
     # Format sources with Markdown for Open WebUI
-    context = "\n".join([f"{s['source']}; Slide {s['slide_number']}\n" for s in retrieved_slides if s["source"] != "Unknown source"])
+    context = "\n".join([f"[Slide {s['slide_number']}]({s['source']}):\n {s['text']}" for s in retrieved_slides if s["source"] != "Unknown source"])
 
     prompt = f"Using the following context, answer the question:\n\nContext:\n{context}\n\nQuestion: {query}"
 
@@ -122,7 +122,7 @@ def query_rag():
 
     # Format sources for Open WebUI as Markdown links
     formatted_sources = [
-        f"[Slide {s['slide_number']}]({s['source']}): {s['text']}" for s in raw_sources if s["source"] != "Unknown source"
+        f"{s['source']}; Slide {s['slide_number']}\n" for s in raw_sources if s["source"] != "Unknown source"
     ]
 
     return jsonify({
