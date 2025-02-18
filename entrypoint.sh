@@ -16,13 +16,6 @@ python /app/backend/check_ollama_models.py
 # echo "Processing PowerPoint files..."
 # python /app/backend/process_pptx.py
 
-# Start the cron service
-echo "Starting cron service..."
-service cron start
-
-# Schedule a cron job to run process_pptx.py every day at 1:00 AM
-echo "0 1 * * * python /app/backend/process_pptx.py" | crontab -
-
 # Start the Flask application
 echo "Starting the Flask API..."
 exec python /app/backend/rag_api.py
