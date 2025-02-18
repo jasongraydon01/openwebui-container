@@ -29,6 +29,7 @@ services:
       - ./backend:/app/backend  # Mount backend code (useful for development)
       - ./pptx_files:/app/pptx_files  # Mount PPTX files
       - ./entrypoint.sh:/app/entrypoint.sh
+      - file_log_db:/app/file_log.db  # Persist database file
     working_dir: /app/backend  # Set the working directory to /app/backend
     entrypoint: ["/bin/bash", "-c", "pip install --no-cache-dir -r requirements.txt && /app/entrypoint.sh"]
     depends_on:
