@@ -43,7 +43,7 @@ index = pc.Index(PINECONE_INDEX_NAME)
 print(f"Connected to Pinecone Index: {PINECONE_INDEX_NAME}")
 
 # Folder Path (Local Directory for PowerPoints)
-FOLDER_PATH = "pptx_files"
+FOLDER_PATH = os.getenv("FOLDER_PATH")
 
 # Function to Check for Removed Files and Clean Up Corresponding Data
 def check_for_removed_files():
