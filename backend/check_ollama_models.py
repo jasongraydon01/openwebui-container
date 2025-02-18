@@ -9,6 +9,7 @@ def check_and_download_model(model):
     try:
         # List all available models
         response = list()
+        print(response)
 
         # Check if the model is already installed
         model_exists = False
