@@ -17,15 +17,15 @@ services:
       - WEBUI_HIDE_DEFAULT_MODELS=true
       - WEBUI_ENABLE_FILE_UPLOADS=true
       - WEBUI_NAME=HawkPartners
-      - CUSTOM_NAME=HawkPartners
-      - ENABLE_AUTOCOMPLETE_GENERATION=false
+      # - CUSTOM_NAME=HawkPartners
+      # - ENABLE_AUTOCOMPLETE_GENERATION=false
+      # - ENABLE_RAG_WEB_SEARCH=true
+      # - RAG_WEB_SEARCH_ENGINE=searchapi
+      # - SEARCH_API_KEY=gW9NEYWby2vdgsFvJjFPzsv9
+      # - SEARCHAPI_ENGINE=google
+      # # - RAG_EMBEDDING_ENGINE=ollama
+      # # - RAG_EMBEDDING_MODEL=nomic-embed-text
       - NVIDIA_VISIBLE_DEVICES=all
-      - ENABLE_RAG_WEB_SEARCH=true
-      - RAG_WEB_SEARCH_ENGINE=searchapi
-      - SEARCH_API_KEY=gW9NEYWby2vdgsFvJjFPzsv9
-      - SEARCHAPI_ENGINE=google
-      # - RAG_EMBEDDING_ENGINE=ollama
-      # - RAG_EMBEDDING_MODEL=nomic-embed-text
     restart: unless-stopped
     runtime: nvidia
 
