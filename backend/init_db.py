@@ -11,6 +11,12 @@ def initialize_database():
     # Check if the file_log.db exists
     if not os.path.exists(DB_PATH):
         print(f"⚠️ Database not found. Creating {DB_PATH}...")
+        # Create the file if it doesn't exist
+        open(DB_PATH, 'w').close()
+
+    # Check if the file is empty
+    if os.path.getsize(DB_PATH) == 0:
+        print(f"⚠️ Database file is empty. Initializing database at {DB_PATH}...")
 
     # Connect to the SQLite database (it will create the file if it doesn't exist)
     conn = sqlite3.connect(DB_PATH)
