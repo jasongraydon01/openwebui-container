@@ -7,22 +7,19 @@ services:
     volumes:
       - open-webui:/app/backend/data
     environment:
-      - WEBUI_ENV=production
-      - WEBUI_ENABLE_CONTROLS=true
-      - WEBUI_ENABLE_MULTI_USER=true
-      - WEBUI_DEFAULT_MODELS=ollama/mistral:7b
-      - WEBUI_OLLAMA_BASE_URL=http://ollama:11434
-      - WEBUI_ALLOW_FILE_UPLOADS=true
-      - WEBUI_DISABLE_ANALYTICS=true
-      - WEBUI_HIDE_DEFAULT_MODELS=true
-      - WEBUI_ENABLE_FILE_UPLOADS=true
+      - DEFAULT_MODELS=HawkGPT
+      - OLLAMA_BASE_URL=http://ollama:11434
       - WEBUI_NAME=HawkPartners
       - ENABLE_AUTOCOMPLETE_GENERATION=false
       - ENABLE_RAG_WEB_SEARCH=true
       - RAG_WEB_SEARCH_ENGINE=searchapi
       - SEARCH_API_KEY=gW9NEYWby2vdgsFvJjFPzsv9
       - SEARCHAPI_ENGINE=google
-      - NVIDIA_VISIBLE_DEVICES=all
+      - ADMIN_EMAIL=jasonandersonjr@me.com
+      - WEBUI_SESSION_COOKIE_SAME_SITE=none
+      - WEBUI_AUTH_COOKIE_SAME_SITE=none
+      - WEBUI_SESSION_COOKIE_SECURE=false
+      - WEBUI_AUTH_COOKIE_SECURE=false
     restart: unless-stopped
     runtime: nvidia
 
