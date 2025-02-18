@@ -70,24 +70,21 @@ class Pipe:
                 json={"query": messages[-1]["content"]},
                 headers={"Content-Type": "application/json"},
             )
-            
             if response.status_code == 200:
-                api_data = response.json()
-                rag_response = api_data.get("response", "No response received")
-                sources = api_data.get("sources", [])
+                rag_response = response.json().get("response", "No response received")
+                rag_sources = response.json().get("sources", "None found")
 
-                # Format sources for OpenWebUI
-                formatted_sources = "\n\n**Sources:**\n" + "\n".join(sources) if sources else ""
-                
+                # Append sources to response if available
+                if rag_sources:
+                    rag_response += "\n\n**Sources:**\n" + "\n".join(rag_sources)
+
             else:
                 rag_response = f"API Error: {response.status_code} - {response.text}"
-                formatted_sources = ""
 
         except Exception as e:
             rag_response = f"Error: {str(e)}"
-            formatted_sources = ""
 
         await self.emit_status(__event_emitter__, "info", "Complete", True)
 
-        # Return structured response with sources appended
-        return {"response": f"{rag_response}{formatted_sources}"}
+        # Return the agent's response as expected by OpenWebUI
+        return rag_response
