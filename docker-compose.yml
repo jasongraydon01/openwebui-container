@@ -36,6 +36,7 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - DATABASE_PATH=/app/file_log.db  # Use path inside container
+      - FOLDER_PATH=/app/pptx_files  # Use path inside container
       - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
     runtime: nvidia
