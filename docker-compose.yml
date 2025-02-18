@@ -28,8 +28,8 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./backend:/app/backend:rw  # Mount backend code (useful for development)
-      - ./pptx_files:/app/pptx_files:rw  # Mount PPTX files
+      - ./backend:/app/backend  # Mount backend code (useful for development)
+      - ./pptx_files:/app/pptx_files  # Mount PPTX files
     entrypoint: ["/app/entrypoint.sh"]
     depends_on:
       - ollama  # This just ensures Ollama is started, but does not wait for readiness
