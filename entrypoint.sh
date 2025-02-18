@@ -12,9 +12,9 @@ python /app/backend/pinecone_index.py
 echo "Checking for required Ollama models..."
 python /app/backend/check_ollama_models.py
 
-# # Process PowerPoint files after models are downloaded
-# echo "Processing PowerPoint files..."
-# python /app/backend/process_pptx.py
+# Process PowerPoint files after models are downloaded
+echo "Processing PowerPoint files..."
+python /app/backend/process_pptx.py
 
 # Start the Flask application
 echo "Starting the Flask API..."
