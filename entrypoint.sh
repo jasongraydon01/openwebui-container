@@ -8,18 +8,9 @@ python /app/backend/init_db.py
 echo "Initializing Pinecone index..."
 python /app/backend/pinecone_index.py
 
-# Ensure required Ollama models are downloaded
+# Ensure required Ollama models are downloaded using the Python script
 echo "Checking for required Ollama models..."
-models=("mistral:7b" "nomic-embed-text" "deepseek-r1:7b")
-
-for model in "${models[@]}"; do
-    if ! ollama list | grep -q "$model"; then
-        echo "Downloading model: $model..."
-        ollama pull "$model"
-    else
-        echo "Model $model already exists."
-    fi
-done
+python /app/backend/check_ollama_models.py
 
 # Process PowerPoint files after models are downloaded
 echo "Processing PowerPoint files..."
