@@ -46,6 +46,7 @@
       ```
 
 11. **Check the setup to ensure openwebui is running**:
+    - Make sure to update the urls with the instance ip address.
     - Open WebUI should be accessible at `http://<instance-ip>:3000`
     - Ollama should be accessible at `http://<instance-ip>:11434`
     - RAG API should be accessible at `http://<instance-ip>:5001`
