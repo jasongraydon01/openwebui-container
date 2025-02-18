@@ -30,14 +30,14 @@ services:
       - ./backend:/app/backend  # Mount backend code (useful for development)
       - ./pptx_files:/app/pptx_files  # Mount PPTX files
       - ./entrypoint.sh:/app/entrypoint.sh
-      - file_log_db:/app/file_log.db  # Persist database file
+      - file_log_db:/app/log:rw  # Persist database folder
     working_dir: /app/backend  # Set the working directory to /app/backend
     entrypoint: ["/bin/bash", "-c", "pip install --no-cache-dir -r requirements.txt && /app/entrypoint.sh"]
     depends_on:
       - ollama  # This just ensures Ollama is started, but does not wait for readiness
     environment:
       - OLLAMA_HOST=http://ollama:11434
-      - DATABASE_PATH=/app/file_log.db  # Use path inside container
+      - DATABASE_PATH=/app/log/file_log.db  # Use path inside container
       - FOLDER_PATH=/app/pptx_files  # Use path inside container
       - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
