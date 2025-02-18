@@ -20,9 +20,8 @@ python /app/backend/check_ollama_models.py
 echo "Starting cron service..."
 service cron start
 
-# Ensure cron job exists
-echo "Setting up scheduled tasks..."
-crontab /app/backend/cronjobs
+# Schedule a cron job to run process_pptx.py every day at 1:00 AM
+echo "0 1 * * * python /app/backend/process_pptx.py" | crontab -
 
 # Start the Flask application
 echo "Starting the Flask API..."
