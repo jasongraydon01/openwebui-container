@@ -5,7 +5,7 @@ services:
     ports:
       - "3000:8080"
     volumes:
-      - openwebui_data:/app/backend/data  # Persistent storage for OpenWebUI
+      - openwebui_data:/app/openwebui/data  # Persistent storage for OpenWebUI
     environment:
       - WEBUI_ENV=production
       - WEBUI_ENABLE_CONTROLS=true
@@ -21,16 +21,16 @@ services:
     runtime: nvidia
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: python:3.10-slim  # Use the Python base image
     container_name: backend
     ports:
       - "5001:5001"
     volumes:
       - ./backend:/app/backend  # Mount backend code (useful for development)
-      - ./pptx_files:/app/pptx_files  # Mount PPTX file
-    entrypoint: ["/app/entrypoint.sh"]
+      - ./pptx_files:/app/pptx_files  # Mount PPTX files
+      - ./entrypoint.sh:/app/entrypoint.sh
+    working_dir: /app/backend  # Set the working directory to /app/backend
+    entrypoint: ["/bin/bash", "-c", "pip install --no-cache-dir -r requirements.txt && /app/entrypoint.sh"]
     depends_on:
       - ollama  # This just ensures Ollama is started, but does not wait for readiness
     environment:
