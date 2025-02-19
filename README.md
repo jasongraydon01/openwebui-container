@@ -28,16 +28,8 @@
      ```bash
      gh repo clone <username>/<repo_name>
      ```
-
-8. **Create `.env` file in `backend/`**:
-   - Create and edit `.env` file using `nano` or `vim`.
-   - Add your environment variables as required.
-
-9. **Run `docker-compose build`**:
-   - Build the Docker images defined in `docker-compose.yml`:
-     ```bash
-     docker-compose build
-     ```
+8. **Manually, start onedrive container**:
+   - Insert the following command into the instance terminal:
 
 10. **Run `docker-compose up -d`**:
     - Start the services in detached mode:
