@@ -15,11 +15,6 @@ services:
       - RAG_WEB_SEARCH_ENGINE=searchapi
       - SEARCH_API_KEY=gW9NEYWby2vdgsFvJjFPzsv9
       - SEARCHAPI_ENGINE=google
-      - ADMIN_EMAIL=jasonandersonjr@me.com
-      - WEBUI_SESSION_COOKIE_SAME_SITE=none
-      - WEBUI_AUTH_COOKIE_SAME_SITE=none
-      - WEBUI_SESSION_COOKIE_SECURE=false
-      - WEBUI_AUTH_COOKIE_SECURE=false
     restart: unless-stopped
     runtime: nvidia
 
@@ -70,5 +65,5 @@ services:
 volumes:
   open-webui:
   file_log_db:  # Persistent volume for file_log.db
-  onedrive_conf:
-  onedrive:
+  # onedrive_conf:
+  # onedrive:
