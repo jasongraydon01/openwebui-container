@@ -52,15 +52,15 @@ services:
     restart: unless-stopped
     runtime: nvidia
 
-    onedrive:
-        image: driveone/onedrive:edge
-        restart: unless-stopped
-        environment:
-            - ONEDRIVE_UID=1000
-            - ONEDRIVE_GID=1000
-        volumes: 
-            - onedrive_conf:/onedrive/conf
-            - ./home/ubuntu/OneDrive/OneDrive-Test:/onedrive/data
+  onedrive:
+      image: driveone/onedrive:edge
+      restart: unless-stopped
+      environment:
+          - ONEDRIVE_UID=1000
+          - ONEDRIVE_GID=1000
+      volumes: 
+          - onedrive_conf:/onedrive/conf
+          - ./home/ubuntu/OneDrive/OneDrive-Test:/onedrive/data
 
 volumes:
   open-webui:
