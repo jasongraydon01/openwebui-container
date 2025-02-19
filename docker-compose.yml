@@ -56,8 +56,8 @@ services:
         image: driveone/onedrive:edge
         restart: unless-stopped
         environment:
-            - ONEDRIVE_UID=${PUID}
-            - ONEDRIVE_GID=${PGID}
+            - ONEDRIVE_UID=1000
+            - ONEDRIVE_GID=1000
         volumes: 
             - onedrive_conf:/onedrive/conf
             - ./home/ubuntu/OneDrive/OneDrive-Test:/onedrive/data
