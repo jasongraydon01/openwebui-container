@@ -121,7 +121,7 @@ def summarize_slide(content):
 
     Summary:
     """
-    response = ollama.chat(model="mistral:7b", messages=[{"role": "user", "content": prompt}])
+    response = ollama.chat(model="mistral:7b-text-fp16", messages=[{"role": "user", "content": prompt}])
     return response["message"]["content"]
 
 # Function to Process PowerPoint Files & Store in Pinecone

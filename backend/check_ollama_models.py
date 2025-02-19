@@ -2,7 +2,7 @@ from ollama import pull, list
 from tqdm import tqdm
 
 # List of required Ollama models
-models = ["mistral:7b", "nomic-embed-text:latest", "deepseek-r1:7b"]
+models = ["nomic-embed-text:latest", "deepseek-r1:14b", "llama3.2:1b-text-fp16", "llama3.2:1b-instruct-fp16", "mistral:7b-text-fp16", "mistral:7b-instruct-fp16", "llama3.1:8b-text-fp16", "llama3.1:8b-instruct-fp16", "qwen2.5:14b-instruct-fp16", "qwen2.5:14b-text-fp16"]
 
 def check_and_download_model(model):
     """Check if the model is installed, and if not, download it."""
