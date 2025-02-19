@@ -52,18 +52,17 @@ services:
     restart: unless-stopped
     runtime: nvidia
 
-    # onedrive:
-    #     image: driveone/onedrive:edge
-    #     restart: unless-stopped
-    #     environment:
-    #         - ONEDRIVE_UID=${PUID}
-    #         - ONEDRIVE_GID=${PGID}
-    #     volumes: 
-    #         - onedrive_conf:/onedrive/conf
-    #         - onedrive:/onedrive/data
+    onedrive:
+        image: driveone/onedrive:edge
+        restart: unless-stopped
+        environment:
+            - ONEDRIVE_UID=${PUID}
+            - ONEDRIVE_GID=${PGID}
+        volumes: 
+            - onedrive_conf:/onedrive/conf
+            - ./home/ubuntu/OneDrive/OneDrive-Test:/onedrive/data
 
 volumes:
   open-webui:
   file_log_db:  # Persistent volume for file_log.db
-  # onedrive_conf:
-  # onedrive:
+  onedrive_conf:
