@@ -54,7 +54,7 @@ services:
 
   onedrive:
       image: driveone/onedrive:edge
-      container_name: onedrive
+      container_name: onedrive-container
       restart: unless-stopped
       environment:
           - ONEDRIVE_UID=1000
