@@ -2,7 +2,7 @@
 ## Deployment Steps for Docker Containers on AWS EC2 (g6e.12xlarge)
 
 1. **Launch Amazon EC2 instance (g6e.12xlarge)**:
-   - Start with `g6e.12xlarge	` (due to 8-CPU limit but scale up later as needed).
+   - Start with `g6e.12xlarge`.
    - Adjust security to allow 3000, 5001, 11434, 8080.
 
 2. **Set up standard Ubuntu protocols**:
