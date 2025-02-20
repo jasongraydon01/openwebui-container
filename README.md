@@ -1,127 +1,170 @@
 # openwebui-container
 ## Deployment Steps for Docker Containers on AWS EC2 (g6e.12xlarge)
 
-1. **Launch Amazon EC2 instance (g6e.12xlarge)**:
-   - Start with `g6e.12xlarge`.
-   - Adjust security to allow 3000, 5001, 11434, 8080.
+### **1. Launch Amazon EC2 Instance (g6e.12xlarge)**
+- Start with `g6e.12xlarge`.
+- Adjust security group rules to allow access on **ports 3000, 5001, 11434, and 8080**.
 
-2. **Set up standard Ubuntu protocols**:
-   - Update system packages: `sudo apt update && sudo apt upgrade`
-   - Install necessary dependencies: `sudo apt install curl wget build-essential`
-   - Set up firewall and security rules as required.
+### **2. Set Up Standard Ubuntu Protocols**
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl wget build-essential
+```
+- Set up firewall and security rules as needed.
 
-3. **Install Docker**:
-   - Install Docker from the official website.
+### **3. Install Docker**
+```bash
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-4. **Install Docker Compose**:
-   - Install Docker Compose from the official website.
+# Add the repository to Apt sources:
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-5. **Install GitHub CLI**:
-   - Install GitHub CLI from the official website.
-   - Authenticate with GitHub.
+sudo apt-get update
 
-6. **Ensure any repo changes are uploaded**:
-   - Push any local changes to the GitHub repository before pulling to ensure the remote is up to date.
+# Install Docker Engine and necessary components
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-7. **Pull the repo into the instance**:
-   - Clone the repository onto the instance using GitHub CLI:
-     ```bash
-     gh repo clone <username>/<repo_name>
-     ```
+# Verify installation
+sudo docker run hello-world
+```
+
+### **4. Install Docker Compose**
+```bash
+sudo apt-get update
+sudo apt-get install -y docker-compose-plugin
+
+# Verify installation
+sudo docker compose version
+```
+
+### **5. Install GitHub CLI**
+```bash
+# Install GitHub CLI
+(type -p wget >/dev/null || (sudo apt update && sudo apt-get install -y wget)) \
+    && sudo mkdir -p -m 755 /etc/apt/keyrings \
+    && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+    && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && sudo apt update \
+    && sudo apt install -y gh
+
+# Authenticate with GitHub
+gh auth login
+```
+
+### **6. Pull the Repository**
+```bash
+gh repo clone <username>/<repo_name>
+```
 
 ## OneDrive Sync Setup
 
-### **Usage Plan**
-1. **We only care about syncing a specific folder indefinitely on the instance**.
-   - No need for a Docker container; we will use the native OneDrive client.
-   - Set up a specific sync folder using OneDrive's configuration.
-   
-2. **Automate OneDrive Start/Stop with Instance Lifecycle**.
-   - Since the instance only runs 40-50 hours per week, we need a way to ensure OneDrive starts when the instance starts and stops when the instance shuts down.
+### **1. Install OneDrive Client**
+```bash
+wget -qO - https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /usr/share/keyrings/obs-onedrive.gpg > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
+sudo apt-get update
+sudo apt install --no-install-recommends --no-install-suggests onedrive
 
-3. **Manual authentication may be required if the instance is inactive for too long**.
-   - If the instance has been shut down for an extended period, OneDrive may require re-authentication upon startup.
+# Initial setup
+onedrive
+```
 
-### **Install OneDrive Client**
-Follow the installation steps provided in the [OneDrive GitHub repository](https://github.com/abraunegg/onedrive/tree/master).
+### **2. Configure OneDrive for Syncing a Specific Folder**
+```bash
+mkdir -p ~/.config/onedrive
+echo "OneDrive-Test/" > ~/.config/onedrive/sync_list
 
-### **Configure OneDrive for Syncing a Specific Folder**
-1. **Create the sync list file to specify the folder to sync**:
-   ```bash
-   mkdir -p ~/.config/onedrive
-   echo "OneDrive-Test/" > ~/.config/onedrive/sync_list
-   ```
+# Configure HTTP settings
+echo "force_http_11 = \"true\"" > ~/.config/onedrive/config
 
-2. **Ensure OneDrive is configured correctly**:
-   ```bash
-   onedrive --display-config
-   ```
+# Verify configuration
+onedrive --display-config
+```
 
-3. **Start the OneDrive sync process in the background**:
-   ```bash
-   nohup onedrive --monitor > ~/onedrive.log 2>&1 & disown
-   ```
-   - This ensures the process **runs indefinitely**, even after logging out.
-   - To check logs:
-     ```bash
-     tail -f ~/onedrive.log
-     ```
+### **3. Perform One-Time Sync**
+```bash
+onedrive --sync
+```
 
-4. **Enable automatic start on boot using `systemd`**:
-   ```bash
-   mkdir -p ~/.config/systemd/user
-   nano ~/.config/systemd/user/onedrive.service
-   ```
-   Add the following content:
-   ```ini
-   [Unit]
-   Description=OneDrive Cloud Sync Service
-   After=network-online.target
-
-   [Service]
-   ExecStart=/usr/bin/onedrive --monitor
-   Restart=always
-   RestartSec=10
-
-   [Install]
-   WantedBy=default.target
-   ```
-
-5. **Enable and start the service**:
-   ```bash
-   systemctl --user enable onedrive
-   systemctl --user start onedrive
-   ```
-
-6. **Set up a final sync at the end of the day** (before the instance stops):
-   ```bash
-   crontab -e
-   ```
-   Add:
-   ```
-   55 16 * * 1-5 /usr/bin/onedrive --synchronize
-   ```
-   - This ensures a sync is triggered at **4:55 PM (Monday to Friday)** before the instance shuts down.
-
----
-
-## Continue Docker Setup
-
-8. **Run `docker-compose up -d`**:
-    - Start the services in detached mode:
-      ```bash
-      docker-compose up -d
-      ```
-
-9. **Check the setup to ensure OpenWebUI is running**:
-    - Make sure to update the URLs with the instance IP address.
-    - Open WebUI should be accessible at `http://<instance-ip>:3000`
-    - Ollama should be accessible at `http://<instance-ip>:11434`
-    - RAG API should be accessible at `http://<instance-ip>:5001`
-
-### **Additional Considerations**:
-- **Verify Docker and Docker Compose**: After installation, verify Docker and Docker Compose are running correctly:
+### **4. Enable Background Sync**
+```bash
+nohup onedrive --monitor > ~/onedrive.log 2>&1 & disown
+```
+- This ensures the process **runs indefinitely**, even after logging out.
+- To check logs:
   ```bash
-  docker --version
-  docker-compose --version
+  tail -f ~/onedrive.log
+  ```
+
+### **5. Enable Automatic Start on Boot with `systemd`**
+```bash
+mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/onedrive.service
+```
+Paste the following:
+```ini
+[Unit]
+Description=OneDrive Cloud Sync Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/onedrive --monitor
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+```
+
+```bash
+systemctl --user enable onedrive
+systemctl --user start onedrive
+```
+
+### **6. Schedule Final Sync Before Instance Stops**
+```bash
+crontab -e
+```
+Add:
+```bash
+55 16 * * 1-5 /usr/bin/onedrive --synchronize
+```
+This ensures a sync is triggered at **4:55 PM (Monday to Friday)** before the instance shuts down.
+
+## **Continue Docker Setup**
+
+### **7. Run `docker-compose up -d`**
+```bash
+docker-compose up -d
+```
+
+### **8. Verify OpenWebUI and APIs**
+- **Open WebUI**: `http://<instance-ip>:3000`
+- **Ollama**: `http://<instance-ip>:11434`
+- **RAG API**: `http://<instance-ip>:5001`
+
+### **9. Verify Docker Installation**
+```bash
+docker --version
+docker-compose --version
+```
+
+### **Final Notes**
+- If OneDrive authentication expires, manually re-authenticate with:
+  ```bash
+  onedrive
+  ```
+- If needed, restart OneDrive monitoring:
+  ```bash
+  systemctl --user restart onedrive
   ```
