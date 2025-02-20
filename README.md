@@ -143,7 +143,7 @@ docker-compose up -d
 ```
 
 ### **Verify OpenWebUI and APIs**
-- **Open WebUI**: `http://<instance-ip>:3000`
+- **Open WebUI**: `http://<instance-ip>:3100`
 - **Ollama**: `http://<instance-ip>:11434`
 - **RAG API**: `http://<instance-ip>:5001`
 
