@@ -1,18 +1,46 @@
 # openwebui-container
 ## Deployment Steps for Docker Containers on AWS EC2 (g6e.12xlarge)
 
-### **1. Launch Amazon EC2 Instance (g6e.12xlarge)**
-- Start with `g6e.12xlarge`.
+### **1. Launch Amazon EC2 Instance (Ubuntu Server 24.04, General Purpose)**
+- Use **Ubuntu Server 24.04 LTS** instead of deep learning AMIs.
+- This ensures better package management and avoids conflicts with pre-installed dependencies.
 - Adjust security group rules to allow access on **ports 3000, 5001, 11434, and 8080**.
 
-### **2. Set Up Standard Ubuntu Protocols**
+### **2. Install NVIDIA CUDA Toolkit & Drivers (Network `deb` method)**
+
+```bash
+# Add NVIDIA's CUDA repository and install keyring
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+
+# Set Up CUDA Environment Variables:
+echo 'export PATH="/usr/local/cuda-12.8/bin:$PATH"' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH="/usr/local/cuda-12.8/lib64:$LD_LIBRARY_PATH"' >> ~/.bashrc
+source ~/.bashrc
+# Install CUDA Toolkit 12.8
+sudo apt-get install -y cuda-toolkit-12-8
+
+# Install the NVIDIA Open Kernel Module Driver (Recommended)
+sudo apt-get install -y nvidia-open
+```
+
+**Verify Installation:**
+```bash
+nvidia-smi
+nvcc --version
+```
+- `nvidia-smi` should show your **GPU model** and **driver version**.
+- `nvcc --version` should confirm **CUDA 12.8** is installed.
+
+### **3. Set Up Standard Ubuntu Protocols**
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl wget build-essential
 ```
 - Set up firewall and security rules as needed.
 
-### **3. Install Docker**
+### **4. Install Docker**
 ```bash
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -36,7 +64,7 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo docker run hello-world
 ```
 
-### **4. Install Docker Compose**
+### **5. Install Docker Compose**
 ```bash
 sudo apt-get update
 sudo apt-get install -y docker-compose-plugin
@@ -45,7 +73,7 @@ sudo apt-get install -y docker-compose-plugin
 sudo docker compose version
 ```
 
-### **5. Install GitHub CLI**
+### **6. Install GitHub CLI**
 ```bash
 # Install GitHub CLI
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install -y wget)) \
@@ -61,17 +89,40 @@ sudo docker compose version
 gh auth login
 ```
 
-### **6. Pull the Repository**
+### **7. Pull the Repository**
 ```bash
 gh repo clone <username>/<repo_name>
 ```
 
 ## OneDrive Sync Setup
 
-### **1. Install OneDrive Client**
+### **1. Upgrade cURL Before Syncing**
+Before performing the OneDrive sync, ensure that you have the latest version of `cURL` installed:
 ```bash
-wget -qO - https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /usr/share/keyrings/obs-onedrive.gpg > /dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
+curl --version
+```
+If the version is below `8.12.1`, install or upgrade it manually:
+```bash
+sudo apt remove --purge curl -y
+sudo apt update && sudo apt install -y build-essential libssl-dev libnghttp2-dev libpsl-dev pkg-config
+cd /usr/local/src
+sudo wget https://curl.se/download/curl-8.12.1.tar.gz
+sudo tar -xzf curl-8.12.1.tar.gz
+cd curl-8.12.1
+./configure --prefix=/usr/local --with-ssl --with-nghttp2
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+```
+Verify the updated version:
+```bash
+curl --version
+```
+
+### **2. Install OneDrive Client**
+```bash
+wget -qO - https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_24.04/Release.key | gpg --dearmor | sudo tee /usr/share/keyrings/obs-onedrive.gpg > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_24.04/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
 sudo apt-get update
 sudo apt install --no-install-recommends --no-install-suggests onedrive
 
@@ -79,7 +130,7 @@ sudo apt install --no-install-recommends --no-install-suggests onedrive
 onedrive
 ```
 
-### **2. Configure OneDrive for Syncing a Specific Folder**
+### **3. Configure OneDrive for Syncing a Specific Folder**
 ```bash
 mkdir -p ~/.config/onedrive
 echo "OneDrive-Test/" > ~/.config/onedrive/sync_list
@@ -91,12 +142,12 @@ echo "force_http_11 = \"true\"" > ~/.config/onedrive/config
 onedrive --display-config
 ```
 
-### **3. Perform One-Time Sync**
+### **4. Perform One-Time Sync**
 ```bash
 onedrive --sync
 ```
 
-### **4. Enable Background Sync**
+### **5. Enable Background Sync**
 ```bash
 nohup onedrive --monitor > ~/onedrive.log 2>&1 & disown
 ```
@@ -106,7 +157,7 @@ nohup onedrive --monitor > ~/onedrive.log 2>&1 & disown
   tail -f ~/onedrive.log
   ```
 
-### **5. Enable Automatic Start on Boot with `systemd`**
+### **6. Enable Automatic Start on Boot with `systemd`**
 ```bash
 mkdir -p ~/.config/systemd/user
 nano ~/.config/systemd/user/onedrive.service
@@ -131,7 +182,7 @@ systemctl --user enable onedrive
 systemctl --user start onedrive
 ```
 
-### **6. Schedule Final Sync Before Instance Stops**
+### **7. Schedule Final Sync Before Instance Stops**
 ```bash
 crontab -e
 ```
@@ -143,28 +194,18 @@ This ensures a sync is triggered at **4:55 PM (Monday to Friday)** before the in
 
 ## **Continue Docker Setup**
 
-### **7. Run `docker-compose up -d`**
+### **8. Run `docker-compose up -d`**
 ```bash
 docker-compose up -d
 ```
 
-### **8. Verify OpenWebUI and APIs**
+### **9. Verify OpenWebUI and APIs**
 - **Open WebUI**: `http://<instance-ip>:3000`
 - **Ollama**: `http://<instance-ip>:11434`
 - **RAG API**: `http://<instance-ip>:5001`
 
-### **9. Verify Docker Installation**
+### **10. Verify Docker Installation**
 ```bash
 docker --version
 docker-compose --version
 ```
-
-### **Final Notes**
-- If OneDrive authentication expires, manually re-authenticate with:
-  ```bash
-  onedrive
-  ```
-- If needed, restart OneDrive monitoring:
-  ```bash
-  systemctl --user restart onedrive
-  ```
