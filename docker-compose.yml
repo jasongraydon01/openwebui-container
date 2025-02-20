@@ -3,7 +3,7 @@ services:
     image: ghcr.io/open-webui/open-webui:cuda
     container_name: openwebui
     ports:
-      - "3000:8080"
+      - "3100:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
