@@ -74,7 +74,7 @@ def retrieve_relevant_slides(query, top_k=3):
 # ✅ Add Normal Chat Handling (No RAG)
 def chat_normal(query):
     """Generates a normal response from the LLM without retrieval augmentation."""
-    response = ollama.chat(model="mistral:7b-instruct-fp16", messages=[{"role": "user", "content": query}])
+    response = ollama.chat(model="qwen:14b-chat-fp16", messages=[{"role": "user", "content": query}])
     return response.get("message", {}).get("content", "No response generated.")
 
 # ✅ Add RAG-Based Chat with Context
@@ -91,7 +91,7 @@ def chat_with_rag(query, retrieved_slides=None):
 
     prompt = f"Using the following context, answer the question:\n\nContext:\n{context}\n\nQuestion: {query}"
 
-    response = ollama.chat(model="mistral:7b-instruct-fp16", messages=[{"role": "user", "content": prompt}])
+    response = ollama.chat(model="qwen:14b-chat-fp16", messages=[{"role": "user", "content": prompt}])
     return response.get("message", {}).get("content", "No response generated."), retrieved_slides
 
 # ✅ Improve Decision Logic for Using RAG
