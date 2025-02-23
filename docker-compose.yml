@@ -52,16 +52,19 @@ services:
     restart: unless-stopped
     runtime: nvidia
 
-  vllm:
-    image: vllm/vllm-openai:latest
-    container_name: vllm
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./vllm/src:/workspace/src
-    working_dir: /workspace
-    restart: unless-stopped
-    runtime: nvidia
+vllm:
+  image: vllm/vllm-openai:latest
+  container_name: vllm
+  ports:
+    - "8000:8000"
+  volumes:
+    -./vllm/src:/workspace/src
+  working_dir: /workspace
+  environment:
+    - MODEL=Qwen/Qwen2.5-14B-Instruct-1M  # Replace with your desired model name
+  command: vllm serve --model ${MODEL}  # Use the environment variable
+  restart: unless-stopped
+  runtime: nvidia
 
 volumes:
   open-webui:
