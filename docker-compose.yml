@@ -53,9 +53,7 @@ services:
     runtime: nvidia
 
   vllm:
-    build:
-      context: ./vllm
-      dockerfile: Dockerfile
+    image: vllm/vllm-openai:latest
     container_name: vllm
     ports:
       - "8000:8000"
