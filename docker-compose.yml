@@ -52,14 +52,14 @@ services:
     restart: unless-stopped
     runtime: nvidia
 
-vllm:
-  image: vllm/vllm-openai:latest
-  container_name: vllm
-  ports:
-    - "8000:8000"
-  working_dir: /workspace
-  restart: unless-stopped
-  runtime: nvidia
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm
+    ports:
+      - "8000:8000"
+    working_dir: /workspace
+    restart: unless-stopped
+    runtime: nvidia
 
 volumes:
   open-webui:
