@@ -60,9 +60,7 @@ vllm:
   volumes:
     -./vllm/src:/workspace/src
   working_dir: /workspace
-  environment:
-    - MODEL=Qwen/Qwen2.5-14B-Instruct-1M  # Replace with your desired model name
-  command: vllm serve --model ${MODEL}  # Use the environment variable
+  command: vllm serve --model Qwen/Qwen2.5-14B-Instruct-1M  # Use the environment variable
   restart: unless-stopped
   runtime: nvidia
 
