@@ -52,6 +52,18 @@ services:
     restart: unless-stopped
     runtime: nvidia
 
+  vllm:
+    build:
+      context: ./vllm
+      dockerfile: Dockerfile
+    container_name: vllm
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./vllm:/workspace
+    restart: unless-stopped
+    runtime: nvidia
+
 volumes:
   open-webui:
   file_log_db:  # Persistent volume for file_log.db
