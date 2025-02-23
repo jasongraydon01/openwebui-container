@@ -60,7 +60,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./vllm:/workspace
+      - ./vllm/src:/workspace/src
     restart: unless-stopped
     runtime: nvidia
 
