@@ -60,7 +60,7 @@ vllm:
   volumes:
     -./vllm/src:/workspace/src
   working_dir: /workspace
-  command: vllm serve --model Qwen/Qwen2.5-14B-Instruct-1M  # Use the environment variable
+  # command: vllm serve --model Qwen/Qwen2.5-14B-Instruct-1M  # Use the environment variable
   restart: unless-stopped
   runtime: nvidia
 
