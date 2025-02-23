@@ -19,6 +19,12 @@ RUN echo 'tzdata tzdata/Areas select America' | debconf-set-selections \
 RUN --mount=type=cache,target=/root/.cache/uv \
     python3 -m pip install uv
 
+# Create a virtual environment
+RUN python3 -m venv /opt/venv
+
+# Activate the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
 WORKDIR /workspace
 
 # Install pre-built PyTorch wheel
