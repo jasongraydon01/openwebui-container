@@ -57,8 +57,6 @@ vllm:
   container_name: vllm
   ports:
     - "8000:8000"
-  volumes:
-    -./vllm/src:/workspace/src
   working_dir: /workspace
   restart: unless-stopped
   runtime: nvidia
